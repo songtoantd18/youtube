@@ -47,8 +47,7 @@
             width: 100%;
             height: 100%;
             border: 0;
-            /* background: #000; */
-            background: rgba(255, 0, 0, 0.9);
+            background: #000;
         }
 
         .video-player-overlay {
@@ -87,7 +86,7 @@
             gap: 10px;
             padding: 8px 12px;
             box-sizing: border-box;
-            background: rgba(255, 0, 0, 0.94);
+            background: rgba(0, 0, 0, 0.72);
             color: #fff;
         }
 
@@ -97,7 +96,7 @@
             border: 1px solid rgba(255, 255, 255, .65);
             border-radius: 4px;
             padding: 6px 10px;
-            background: #a90000;
+            background: rgba(0, 0, 0, 0.65);
             color: #fff;
             font: inherit;
             cursor: pointer;
@@ -221,6 +220,14 @@
                 </div>
             </div>
             <p class="video-player-title" id="video-player-title"></p>
+        </section>
+        <section class="add-video-section" aria-label="Thêm video YouTube">
+            <form id="add-video-form">
+                <label for="video-url-input">Thêm link YouTube:</label>
+                <input id="video-url-input" name="videoUrl" type="url" placeholder="https://www.youtube.com/watch?v=..." required>
+                <button type="submit">Thêm video</button>
+                <p id="add-video-message" role="status" aria-live="polite"></p>
+            </form>
         </section>
         <section class="video-grid">
             <div class="video-preview">

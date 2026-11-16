@@ -1,42 +1,43 @@
-// Thêm/sửa video trong mảng này để cập nhật danh sách.
-const videos = [
-  {
-    url: "https://www.youtube.com/watch?v=UJU-HNCOSrQ",
-    title: "Video 1",
-    channel: "Kênh của tôi",
-    thumbnail: "https://img.youtube.com/vi/ZjBZ8MUnB0E/hqdefault.jpg",
-    channelPicture: "channel-pictures/channel-1.jpeg",
-    duration: "",
-    stats: "",
-  },
-  {
-    url: "https://www.youtube.com/watch?v=NVzTjiWdjlc",
-    title: "Video 2",
-    channel: "Kênh của tôi",
-    thumbnail: "https://img.youtube.com/vi/Y9Wl-l9wxVE/hqdefault.jpg",
-    channelPicture: "channel-pictures/channel-1.jpeg",
-    duration: "",
-    stats: "",
-  },
-  {
-    url: "https://www.youtube.com/watch?v=jP0DSBXPL3A",
-    title: "Video 3",
-    channel: "Kênh của tôi",
-    thumbnail: "https://img.youtube.com/vi/jP0DSBXPL3A/hqdefault.jpg",
-    channelPicture: "channel-pictures/channel-1.jpeg",
-    duration: "",
-    stats: "",
-  },
-  {
-    url: "https://www.youtube.com/watch?v=jmU_fq-iTSE&list=RDjmU_fq-iTSE&start_radio=1&t=8890s",
-    title: "Video 4",
-    channel: "Kênh của tôi",
-    thumbnail: "https://img.youtube.com/vi/jmU_fq-iTSE/hqdefault.jpg",
-    channelPicture: "channel-pictures/channel-1.jpeg",
-    duration: "",
-    stats: "",
-  },
+// Danh sách video khởi tạo; video không nhúng được sẽ tự bị bỏ qua.
+const videoUrls = [
+  "https://www.youtube.com/watch?v=UJU-HNCOSrQ",
+  "https://www.youtube.com/watch?v=NVzTjiWdjlc",
+  "https://www.youtube.com/watch?v=jP0DSBXPL3A",
+  "https://www.youtube.com/watch?v=jmU_fq-iTSE&list=RDjmU_fq-iTSE&start_radio=1&t=8890s",
 ];
+const videos = [];
+
+async function fetchVideoDetails(url) {
+  const videoId = getVideoId(url);
+  if (!videoId) return null;
+  const normalizedUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+  try {
+    const endpoint = `https://www.youtube.com/oembed?url=${encodeURIComponent(normalizedUrl)}&format=json`;
+    const response = await fetch(endpoint);
+    if (!response.ok) return null; // Video không công khai/không nhúng được: không hiển thị.
+    const data = await response.json();
+    return {
+      url,
+      title: data.title,
+      channel: data.author_name,
+      thumbnail: data.thumbnail_url || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+      channelPicture: "channel-pictures/channel-1.jpeg",
+      duration: "",
+      stats: "",
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function addVideoUrl(url) {
+  const details = await fetchVideoDetails(url.trim());
+  if (!details || videos.some((video) => getVideoId(video.url) === getVideoId(details.url))) return false;
+  videos.push(details);
+  renderVideos();
+  return true;
+}
 
 // Load the IFrame API after registering its callback, avoiding a race with script loading.
 const youtubeApiScript = document.createElement("script");
@@ -64,12 +65,38 @@ let apiReady = false;
 function getVideoId(url) {
   try {
     const parsedUrl = new URL(url);
-    if (parsedUrl.hostname === "youtu.be") return parsedUrl.pathname.slice(1);
+    const hostname = parsedUrl.hostname.replace(/^www\./, "");
+    if (hostname === "youtu.be") return parsedUrl.pathname.slice(1);
+    if (hostname !== "youtube.com" && hostname !== "m.youtube.com") return null;
     return parsedUrl.searchParams.get("v");
   } catch {
     return null;
   }
 }
+
+function renderVideos() {
+  videoGrid.replaceChildren(...videos.map(createVideoCard));
+}
+
+const addVideoForm = document.querySelector("#add-video-form");
+const videoUrlInput = document.querySelector("#video-url-input");
+const addVideoMessage = document.querySelector("#add-video-message");
+addVideoForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  addVideoMessage.textContent = "Đang kiểm tra link...";
+  const added = await addVideoUrl(videoUrlInput.value);
+  addVideoMessage.textContent = added
+    ? "Đã thêm video."
+    : "Không thể thêm video: link không hợp lệ, video không công khai/không nhúng được, hoặc đã có trong danh sách.";
+  if (added) videoUrlInput.value = "";
+});
+
+async function loadInitialVideos() {
+  const details = await Promise.all(videoUrls.map(fetchVideoDetails));
+  videos.push(...details.filter(Boolean));
+  renderVideos();
+}
+loadInitialVideos();
 
 // Called by YouTube's IFrame Player API when the API script has loaded.
 window.onYouTubeIframeAPIReady = function () {
@@ -260,4 +287,3 @@ function createVideoCard(video) {
   return card;
 }
 
-videoGrid.replaceChildren(...videos.map(createVideoCard));
