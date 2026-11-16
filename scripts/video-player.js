@@ -84,6 +84,7 @@ const replayOverlay = document.querySelector("#video-player-overlay");
 const controls = document.querySelector("#video-player-controls");
 const playToggle = document.querySelector("#player-play-toggle");
 const seek = document.querySelector("#player-seek");
+const playerTime = document.querySelector("#player-time");
 const muteToggle = document.querySelector("#player-mute-toggle");
 const volume = document.querySelector("#player-volume");
 const captionsToggle = document.querySelector("#player-captions-toggle");
@@ -242,10 +243,20 @@ replayOverlay.addEventListener("click", () => {
   youtubePlayer.playVideo();
 });
 
+function formatTime(totalSeconds) {
+  const seconds = Math.max(0, Math.floor(totalSeconds || 0));
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = String(seconds % 60).padStart(2, "0");
+  return h > 0 ? `${h}:${String(m).padStart(2, "0")}:${s}` : `${m}:${s}`;
+}
+
 function updateProgress() {
   if (!youtubePlayer || typeof youtubePlayer.getDuration !== "function") return;
   const duration = youtubePlayer.getDuration();
-  if (duration > 0) seek.value = String(Math.round((youtubePlayer.getCurrentTime() / duration) * 1000));
+  const currentTime = youtubePlayer.getCurrentTime();
+  if (duration > 0) seek.value = String(Math.round((currentTime / duration) * 1000));
+  playerTime.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
   muteToggle.textContent = youtubePlayer.isMuted() ? "🔇" : "🔊";
   const currentVolume = youtubePlayer.getVolume();
   if (Number(volume.value) !== currentVolume) volume.value = String(currentVolume);

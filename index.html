@@ -333,6 +333,13 @@
             cursor: pointer;
         }
 
+        .player-time {
+            flex: none;
+            font-size: 13px;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
         .video-player-controls input[type="range"] {
             flex: 1;
             min-width: 40px;
@@ -454,6 +461,7 @@
                 </button>
                 <div class="video-player-controls" id="video-player-controls" aria-label="Điều khiển video" hidden>
                     <button id="player-play-toggle" type="button" aria-label="Phát hoặc tạm dừng">▶ / ⏸</button>
+                    <span class="player-time" id="player-time" aria-label="Thời gian video">0:00 / 0:00</span>
                     <input id="player-seek" type="range" min="0" max="1000" value="0" aria-label="Tua video">
                     <button id="player-mute-toggle" type="button" aria-label="Tắt/bật tiếng">🔊</button>
                     <input id="player-volume" type="range" min="0" max="100" value="100" aria-label="Âm lượng">
