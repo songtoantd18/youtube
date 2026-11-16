@@ -5,7 +5,25 @@ const videoUrls = [
   "https://www.youtube.com/watch?v=jP0DSBXPL3A",
   "https://www.youtube.com/watch?v=jmU_fq-iTSE&list=RDjmU_fq-iTSE&start_radio=1&t=8890s",
 ];
+const VIDEO_URLS_STORAGE_KEY = "youtube-clone-video-urls";
 const videos = [];
+
+function getSavedVideoUrls() {
+  try {
+    const savedUrls = JSON.parse(localStorage.getItem(VIDEO_URLS_STORAGE_KEY) || "null");
+    return Array.isArray(savedUrls) ? savedUrls : videoUrls;
+  } catch {
+    return videoUrls;
+  }
+}
+
+function saveVideoUrls() {
+  try {
+    localStorage.setItem(VIDEO_URLS_STORAGE_KEY, JSON.stringify(videos.map((video) => video.url)));
+  } catch (error) {
+    console.warn("Không thể lưu danh sách video vào localStorage:", error);
+  }
+}
 
 async function fetchVideoDetails(url) {
   const videoId = getVideoId(url);
@@ -35,6 +53,7 @@ async function addVideoUrl(url) {
   const details = await fetchVideoDetails(url.trim());
   if (!details || videos.some((video) => getVideoId(video.url) === getVideoId(details.url))) return false;
   videos.push(details);
+  saveVideoUrls();
   renderVideos();
   return true;
 }
@@ -81,7 +100,25 @@ function renderVideos() {
 }
 
 const addVideoForm = document.querySelector("#add-video-form");
+const addVideoSection = document.querySelector("#add-video-section");
+const addVideoTrigger = document.querySelector("#add-video-trigger");
 const videoUrlInput = document.querySelector("#video-url-input");
+
+addVideoTrigger.addEventListener("click", () => {
+  const isOpening = addVideoSection.hidden;
+  addVideoSection.hidden = !isOpening;
+  addVideoTrigger.setAttribute("aria-expanded", String(isOpening));
+  if (isOpening) videoUrlInput.focus();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !addVideoSection.hidden) {
+    addVideoSection.hidden = true;
+    addVideoTrigger.setAttribute("aria-expanded", "false");
+    addVideoTrigger.focus();
+  }
+});
+
 const addVideoMessage = document.querySelector("#add-video-message");
 addVideoForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -94,8 +131,12 @@ addVideoForm.addEventListener("submit", async (event) => {
 });
 
 async function loadInitialVideos() {
-  const details = await Promise.all(videoUrls.map(fetchVideoDetails));
+  const urls = getSavedVideoUrls();
+  const details = await Promise.all(urls.map(fetchVideoDetails));
   videos.push(...details.filter(Boolean));
+
+  // Bỏ URL không hợp lệ hoặc video đã bị gỡ/không nhúng được khỏi localStorage.
+  if (details.some((video) => video === null)) saveVideoUrls();
   renderVideos();
 }
 loadInitialVideos();

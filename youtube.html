@@ -3,8 +3,9 @@
 
 <head>
     <title>
-        Youtube.com Clone
+        Youtube
     </title>
+    <link rel="icon" type="image/png" href="channel-pictures/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -13,6 +14,129 @@
     <link rel="stylesheet" href="styles/video.css">
     <link rel="stylesheet" href="styles/sidebar.css">
     <style>
+        .add-video-section {
+            margin: 28px 24px 24px 96px;
+            max-width: 1000px;
+        }
+
+        .add-video-section[hidden] {
+            display: none;
+        }
+
+        .add-video-trigger {
+            position: relative;
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            margin-left: 8px;
+            border: 0;
+            border-radius: 50%;
+            background: #f2f2f2;
+            color: #0f0f0f;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .add-video-trigger:hover {
+            background: #e5e5e5;
+        }
+
+        .add-video-trigger .tooltip {
+            position: absolute;
+            top: 48px;
+            left: 50%;
+            z-index: 20;
+            transform: translateX(-50%);
+            padding: 8px;
+            border-radius: 4px;
+            background: rgba(60, 60, 60, 0.9);
+            color: white;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .add-video-trigger:hover .tooltip,
+        .add-video-trigger:focus-visible .tooltip {
+            opacity: 1;
+        }
+
+        #add-video-form {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px 12px;
+            align-items: center;
+            padding: 18px;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        #add-video-form label {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #0f0f0f;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        #add-video-form label img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        #video-url-input {
+            width: 100%;
+            min-height: 44px;
+            box-sizing: border-box;
+            padding: 0 14px;
+            border: 1px solid #c7c7c7;
+            border-radius: 8px;
+            outline: none;
+            font: inherit;
+            transition: border-color 150ms ease, box-shadow 150ms ease;
+        }
+
+        #video-url-input:focus {
+            border-color: #065fd4;
+            box-shadow: 0 0 0 3px rgba(6, 95, 212, 0.14);
+        }
+
+        #add-video-form button {
+            min-height: 44px;
+            padding: 0 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #0f0f0f;
+            color: #fff;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 150ms ease, transform 150ms ease;
+        }
+
+        #add-video-form button:hover {
+            background: #303030;
+        }
+
+        #add-video-form button:active {
+            transform: scale(0.98);
+        }
+
+        #add-video-message {
+            grid-column: 1 / -1;
+            min-height: 18px;
+            margin: 0;
+            color: #606060;
+            font-size: 13px;
+        }
+
         .video-player-section {
             margin: 96px 24px 24px 96px;
             max-width: 1000px;
@@ -153,6 +277,20 @@
             .video-player-section {
                 margin: 88px 16px 20px;
             }
+
+            .add-video-section {
+                margin: 20px 16px;
+            }
+
+            #add-video-form {
+                grid-template-columns: 1fr;
+                padding: 14px;
+            }
+
+            #add-video-form label,
+            #add-video-message {
+                grid-column: 1;
+            }
         }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -174,6 +312,10 @@
             <button class="voice-search-button">
                 <img class="voice-search-icon" src="icons/voice-search-icon.svg">
                 <div class="tooltip">Search with your voice</div>
+            </button>
+            <button class="add-video-trigger" id="add-video-trigger" type="button" aria-label="Thêm video YouTube" aria-expanded="false" aria-controls="add-video-section">
+                <span aria-hidden="true">+</span>
+                <span class="tooltip">Thêm video</span>
             </button>
         </div>
         <div class="right-section">
@@ -247,9 +389,12 @@
             </div>
             <p class="video-player-title" id="video-player-title"></p>
         </section>
-        <section class="add-video-section" aria-label="Thêm video YouTube">
+        <section class="add-video-section" id="add-video-section" aria-label="Thêm video YouTube" hidden>
             <form id="add-video-form">
-                <label for="video-url-input">Thêm link YouTube:</label>
+                <label for="video-url-input">
+                    <img src="channel-pictures/logo.png" alt="">
+                    <span>Thêm link YouTube:</span>
+                </label>
                 <input id="video-url-input" name="videoUrl" type="url" placeholder="https://www.youtube.com/watch?v=..."
                     required>
                 <button type="submit">Thêm video</button>
