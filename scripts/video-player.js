@@ -58,6 +58,20 @@ async function addVideoUrl(url) {
   return true;
 }
 
+function removeVideo(video) {
+  const index = videos.findIndex((item) => getVideoId(item.url) === getVideoId(video.url));
+  if (index === -1) return;
+
+  videos.splice(index, 1);
+  if (selectedVideo && getVideoId(selectedVideo.url) === getVideoId(video.url)) {
+    selectedVideo = null;
+    playerSection.hidden = true;
+    if (youtubePlayer) youtubePlayer.stopVideo();
+  }
+  saveVideoUrls();
+  renderVideos();
+}
+
 // Load the IFrame API after registering its callback, avoiding a race with script loading.
 const youtubeApiScript = document.createElement("script");
 youtubeApiScript.src = "https://www.youtube.com/iframe_api";
@@ -332,6 +346,18 @@ function createVideoCard(video) {
   thumbnailButton.style.cssText =
     "display:block;width:100%;padding:0;border:0;background:none;cursor:pointer;text-align:left;";
 
+  const removeButton = document.createElement("button");
+  removeButton.className = "video-remove-button";
+  removeButton.type = "button";
+  removeButton.textContent = "×";
+  removeButton.setAttribute("aria-label", `Xóa video: ${video.title}`);
+  removeButton.title = "Xóa video";
+  removeButton.addEventListener("click", () => {
+    if (window.confirm(`Bạn có chắc muốn xóa video “${video.title}” khỏi danh sách không?`)) {
+      removeVideo(video);
+    }
+  });
+
   const thumbnail = document.createElement("img");
   thumbnail.className = "thumbnail";
   thumbnail.src =
@@ -340,7 +366,7 @@ function createVideoCard(video) {
   thumbnail.alt = video.title;
   thumbnailButton.append(thumbnail);
   thumbnailButton.addEventListener("click", () => playVideo(video));
-  thumbnailRow.append(thumbnailButton);
+  thumbnailRow.append(thumbnailButton, removeButton);
 
   if (video.duration) {
     const duration = document.createElement("div");

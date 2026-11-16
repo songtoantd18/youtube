@@ -5,7 +5,7 @@
     <title>
         Youtube
     </title>
-    <link rel="icon" type="image/png" href="channel-pictures/logo.png">
+    <link rel="icon" href="https://www.google.com/s2/favicons?domain=youtube.com&sz=128">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -135,6 +135,35 @@
             margin: 0;
             color: #606060;
             font-size: 13px;
+        }
+
+        .video-remove-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 2;
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(15, 15, 15, 0.82);
+            color: #fff;
+            font-size: 24px;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 150ms ease, background 150ms ease;
+        }
+
+        .thumbnail-row:hover .video-remove-button,
+        .video-remove-button:focus-visible {
+            opacity: 1;
+        }
+
+        .video-remove-button:hover {
+            background: #c00;
         }
 
         .video-player-section {
