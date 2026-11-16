@@ -210,6 +210,7 @@ function playVideo(video) {
   selectedVideo = video;
   playerTitle.textContent = video.title;
   playerSection.hidden = false;
+  document.querySelector("main").classList.add("video-playing-layout");
   replayOverlay.hidden = true;
   playerSection.scrollIntoView({ behavior: "smooth", block: "start" });
 
