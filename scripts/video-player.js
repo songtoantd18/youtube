@@ -224,7 +224,9 @@ function playNextVideo() {
   if (!selectedVideo) return false;
   const currentId = getVideoId(selectedVideo.url);
   const index = videos.findIndex((video) => getVideoId(video.url) === currentId);
-  const next = index >= 0 ? videos[index + 1] : null;
+  if (index === -1) return false;
+  // Phát vòng tròn: hết video cuối thì quay lại video đầu tiên.
+  const next = videos[(index + 1) % videos.length];
   if (!next || !getVideoId(next.url)) return false;
 
   selectedVideo = next;
