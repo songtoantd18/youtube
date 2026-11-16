@@ -57,6 +57,8 @@ const captionsToggle = document.querySelector("#player-captions-toggle");
 const playbackRate = document.querySelector("#player-playback-rate");
 const fullscreenToggle = document.querySelector("#player-fullscreen-toggle");
 const videoGrid = document.querySelector(".video-grid");
+const playerWrap = document.querySelector("#video-player-wrap");
+let controlsHideTimer;
 let progressTimer;
 let youtubePlayer;
 let selectedVideo = null;
@@ -211,9 +213,69 @@ fullscreenToggle.addEventListener("click", async () => {
   }
 });
 
-document.addEventListener("fullscreenchange", () => {
-  fullscreenToggle.setAttribute("aria-label", document.fullscreenElement ? "Thoát toàn màn hình" : "Toàn màn hình");
+function showPlayerControls() {
+  playerWrap.classList.add("controls-visible");
+  clearTimeout(controlsHideTimer);
+  controlsHideTimer = setTimeout(hidePlayerControls, 1800);
+}
+
+function hidePlayerControls() {
+  playerWrap.classList.remove("controls-visible");
+}
+
+playerWrap.addEventListener("pointermove", (event) => {
+  if (event.pointerType === "mouse") showPlayerControls();
 });
+playerWrap.addEventListener("mouseleave", () => {
+  clearTimeout(controlsHideTimer);
+  hidePlayerControls();
+});
+controls.addEventListener("pointermove", showPlayerControls);
+controls.addEventListener("click", () => {
+  clearTimeout(controlsHideTimer);
+  controlsHideTimer = setTimeout(hidePlayerControls, 1800);
+});
+controls.addEventListener("focusin", () => {
+  clearTimeout(controlsHideTimer);
+  playerWrap.classList.add("controls-visible");
+});
+controls.addEventListener("focusout", showPlayerControls);
+
+playerWrap.addEventListener("touchstart", () => {
+  playerWrap.classList.add("touch-controls-visible");
+  clearTimeout(controlsHideTimer);
+  controlsHideTimer = setTimeout(() => playerWrap.classList.remove("touch-controls-visible"), 2500);
+}, { passive: true });
+
+window.addEventListener("mousemove", () => playerWrap.classList.remove("touch-controls-visible"));
+
+document.addEventListener("fullscreenchange", () => {
+  const isFullscreen = document.fullscreenElement === playerWrap;
+  fullscreenToggle.setAttribute("aria-label", isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình");
+  hidePlayerControls();
+  playerWrap.classList.remove("touch-controls-visible");
+  clearTimeout(controlsHideTimer);
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    hidePlayerControls();
+    playerWrap.classList.remove("touch-controls-visible");
+  }
+});
+
+window.addEventListener("blur", hidePlayerControls);
+
+controls.addEventListener("pointerenter", () => clearTimeout(controlsHideTimer));
+controls.addEventListener("pointerleave", showPlayerControls);
+
+playerWrap.addEventListener("pointerdown", (event) => {
+  if (event.pointerType !== "mouse") {
+    playerWrap.classList.toggle("touch-controls-visible");
+  }
+});
+
+playerWrap.addEventListener("click", showPlayerControls);
 
 function createVideoCard(video) {
   const card = document.createElement("article");

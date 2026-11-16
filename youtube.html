@@ -58,7 +58,7 @@
             align-items: center;
             justify-content: center;
             border: 0;
-            background: rgba(255, 0, 0, 0.9);
+            background: rgba(255, 255, 255, 0.9);
             color: #fff;
             cursor: pointer;
             font: inherit;
@@ -88,6 +88,32 @@
             box-sizing: border-box;
             background: rgba(0, 0, 0, 0.72);
             color: #fff;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 180ms ease, visibility 180ms ease;
+        }
+
+        .video-player-wrap.controls-visible .video-player-controls {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Cảm ứng: chạm vào trình phát sẽ hiện thanh; không giữ cố định trên mobile. */
+        .video-player-wrap.touch-controls-visible .video-player-controls {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .video-player-wrap:fullscreen .video-player-controls {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        .video-player-wrap:fullscreen.controls-visible .video-player-controls {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
         }
 
         .video-player-controls button,
@@ -224,7 +250,8 @@
         <section class="add-video-section" aria-label="Thêm video YouTube">
             <form id="add-video-form">
                 <label for="video-url-input">Thêm link YouTube:</label>
-                <input id="video-url-input" name="videoUrl" type="url" placeholder="https://www.youtube.com/watch?v=..." required>
+                <input id="video-url-input" name="videoUrl" type="url" placeholder="https://www.youtube.com/watch?v=..."
+                    required>
                 <button type="submit">Thêm video</button>
                 <p id="add-video-message" role="status" aria-live="polite"></p>
             </form>
