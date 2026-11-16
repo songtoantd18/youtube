@@ -177,6 +177,7 @@ window.onYouTubeIframeAPIReady = function () {
       },
       onStateChange(event) {
         if (event.data === YT.PlayerState.ENDED) {
+          if (playNextVideo()) return;
           replayOverlay.hidden = false;
           playToggle.textContent = "▶";
         } else if (event.data === YT.PlayerState.PLAYING) {
@@ -215,6 +216,21 @@ function playVideo(video) {
   playerSection.scrollIntoView({ behavior: "smooth", block: "start" });
 
   if (apiReady) loadSelectedVideo();
+}
+
+// Tự chuyển video kế tiếp: chỉ đổi nguồn phát và tiêu đề, không cuộn trang
+// và không đổi layout (tránh vỡ giao diện, nhất là khi đang toàn màn hình).
+function playNextVideo() {
+  if (!selectedVideo) return false;
+  const currentId = getVideoId(selectedVideo.url);
+  const index = videos.findIndex((video) => getVideoId(video.url) === currentId);
+  const next = index >= 0 ? videos[index + 1] : null;
+  if (!next || !getVideoId(next.url)) return false;
+
+  selectedVideo = next;
+  playerTitle.textContent = next.title;
+  loadSelectedVideo();
+  return true;
 }
 
 replayOverlay.addEventListener("click", () => {
